@@ -8,11 +8,13 @@
   <body class="height-full">
     <div class="height-full d-flex flex-column">
       {{ template "navbar" . }}
-      {{ template "emojis" dict "Emojis" .Emojis "Categories" .Categories }}
+      <div class="emoji-picker flex-auto flex-column overflow-auto scrollContainer" id="emojis">
+        {{ template "categories" . }}
+      </div>
       <div class="width-full">
         <div class="p-2 d-flex flex-row flex-item-equal">
           <input id="search" class="flex-auto form-control width-full" autocomplete="off" placeholder="Search for emojis" autofocus/>
-            {{ template "skin_tone_selector" .SkinToneSelections }}
+            {{ template "skin_tone_selector" (wrap "SkinToneSelections" .SkinToneSelections "Hand" .Hand) }}
         </div>
       </div>
     </div>

@@ -55,10 +55,26 @@ var (
 			}
 			return dict, nil
 		},
+		"wrap": func(values ...interface{}) (map[string]interface{}, error) {
+			data := make(map[string]interface{}, len(values)/2)
+
+			for i := 0; i < len(values); i += 2 {
+				key, ok := values[i].(string)
+				if !ok {
+					return nil, errors.New("dict keys must be strings")
+				}
+				data[key] = values[i+1]
+			}
+
+			return data, nil
+		},
 	}).ParseGlob("templates/*"))
 
 	// skin tones
-	skinToneSelections = []string{"✋", "✋🏻", "✋🏼", "✋🏽", "✋🏾", "✋🏿"}
+	skinToneSelections = []string{"👋", "👋🏻", "👋🏼", "👋🏽", "👋🏾", "👋🏿"}
+
+	// skin tone selector
+	hand string
 
 	// emoji categories
 	categories = map[string]string{
@@ -72,6 +88,18 @@ var (
 		"flags":              "Flags",
 	}
 
+	// https://stackoverflow.com/a/19127931
+	order = []string{
+		"people",
+		"animals_and_nature",
+		"food_and_drink",
+		"activity",
+		"travel_and_places",
+		"objects",
+		"symbols",
+		"flags",
+	}
+
 	// https://en.wikipedia.org/wiki/Fitzpatrick_scale
 	fitzpatrickScaleModifiers = map[string]string{
 		"skin_tone_1": "🏻",
@@ -83,10 +111,10 @@ var (
 )
 
 type emoji struct {
-	Keywords         []string
-	Char             string
-	FitzpatrickScale bool
-	Category         string
+	Keywords         []string `json:"keywords"`
+	Char             string   `json:"char"`
+	FitzpatrickScale bool     `json:"fitzpatrick_scale"`
+	Category         string   `json:"category"`
 }
 
 // loadEmojis - gets emojis from json, and stores into map of custom type
@@ -109,9 +137,9 @@ func loadEmojis() map[string]emoji {
 		}
 	}
 
-	var Emojis map[string]emoji
-	json.Unmarshal([]byte(string(lib)), &Emojis)
-	return Emojis
+	var emojis map[string]emoji
+	json.Unmarshal(lib, &emojis)
+	return emojis
 }
 
 // fetchEmojis - fetches from source if not available locally
@@ -170,7 +198,6 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	emojis := loadEmojis()
 
 	// skin tone preference
-	var hand string
 	c, err := r.Cookie("tone")
 	if err != nil {
 		// existing preference not set, use default
@@ -185,11 +212,13 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		Emojis             map[string]emoji
 		Categories         map[string]string
 		SkinToneSelections []string
+		Order              []string
 		Hand               string
 	}{
 		emojis,
 		categories,
 		skinToneSelections,
+		order,
 		hand,
 	}
 
@@ -237,15 +266,17 @@ func FetchSkinTonesHandler(w http.ResponseWriter, r *http.Request) {
 		Emojis             map[string]emoji
 		Categories         map[string]string
 		SkinToneSelections []string
+		Order              []string
 		Hand               string
 	}{
 		updatedEmojis,
 		categories,
 		skinToneSelections,
-		"",
+		order,
+		hand,
 	}
 
-	renderTemplate(w, "emojis", data)
+	renderTemplate(w, "categories", data)
 }
 
 func renderTemplate(w http.ResponseWriter, tmpl string, data interface{}) {
