@@ -7,7 +7,7 @@
           <button type="button"
               value="{{ $emoji.Char }}"
               class="emoji rounded-1 px-1 col-2 text-center float-left"
-              title="{{ $name }}">
+              title="{{ concat (printf "%s %s" $name $emoji.Keywords) }}">
             {{ $emoji.Char }}
           </button>
         {{ end }}

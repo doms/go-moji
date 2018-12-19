@@ -38,6 +38,19 @@ var (
 
 			return data, nil
 		},
+		"concat": func(str string, strs ...string) string {
+			// this is really gross and I feel bad for it.
+			// but Go templates won't let me do it in a normal way...
+
+			// join together emoji keywords with emoji name
+			f := str + strings.Join(strs, " ")
+
+			// remove slice brackets in string
+			f = strings.Replace(f, "[", " ", -1)
+			f = strings.Replace(f, "]", " ", -1)
+
+			return strings.Trim(f, " ")
+		},
 	}).ParseGlob("templates/*"))
 
 	// skin tones
