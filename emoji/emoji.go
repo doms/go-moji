@@ -56,6 +56,9 @@ var (
 	// skin tones
 	skinToneSelections = []string{"👋", "👋🏻", "👋🏼", "👋🏽", "👋🏾", "👋🏿"}
 
+	// fetch emojis
+	emojis = loadEmojis()
+
 	// skin tone selector
 	hand string
 
@@ -178,7 +181,9 @@ func mergeMaps(o map[string]emoji, st map[string]emoji) map[string]emoji {
 // IndexHandler - renders the emojis (with skin tone preference if applicable)
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	// get emojis
-	emojis := loadEmojis()
+	if emojis == nil {
+		emojis = loadEmojis()
+	}
 
 	// skin tone preference
 	c, err := r.Cookie("tone")
@@ -211,7 +216,9 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 // FetchSkinTonesHandler - add skin tones to skintone-able emojis
 func FetchSkinTonesHandler(w http.ResponseWriter, r *http.Request) {
 	// load emojis to replace skin-toneable emojis with preferred skin tone emojis
-	emojis := loadEmojis()
+	if emojis == nil {
+		emojis = loadEmojis()
+	}
 
 	// get modifier value
 	tone := r.URL.Query()["skintone"][0]
