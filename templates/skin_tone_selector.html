@@ -1,0 +1,18 @@
+{{ define "skin_tone_selector" }}
+<div class="ml-2 flex-self-center">
+  <div class="d-inline-block details-overlay position-relative">
+    <button type="button" class="px-2 rounded-1 border-0 d-block" id="selectedSkinTone">🤧</button>
+    <div class="position-absolute bg-white p-1 rounded-1 box-shadow-medium border right-0" id="skinToneSelector" style="display: none;">
+      <div class="p-1 f6 text-bold text-gray-light">Choose your default skin tone.</div>
+      <div class="clearfix">
+        {{ range $index, $tone := . }}
+          <button type="button"
+              class="border-0 position-relative rounded-1 px-1 col-2 text-center float-left skin-tone js-skin-tone-selector"
+              data-tone="{{ $index }}">{{ $tone }}
+          </button>
+        {{ end }}
+      </div>
+    </div>
+  </div>
+</div>
+{{ end }}

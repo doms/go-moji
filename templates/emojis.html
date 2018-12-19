@@ -1,0 +1,17 @@
+{{ define "emojis" }}
+<div class="emoji-picker flex-auto flex-column overflow-auto scrollContainer" id="emojis">
+  <div class="emoji-group p-1 js-category-group" id="😤">
+    <div class="emoji-category p-1 my-2 f6 text-bold">Test</div>
+    <div class="clearfix">
+      {{ range $name, $emoji := .Emojis }}
+        <button type="button"
+            value="{{ $emoji.Char }}"
+            class="emoji rounded-1 px-1 col-3 text-center float-left"
+            title="{{ $name }}">
+          {{ $emoji.Char }}
+        </button>
+      {{ end }}
+    </div>
+  </div>
+</div>
+{{ end }}
