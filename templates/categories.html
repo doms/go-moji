@@ -1,7 +1,7 @@
 {{ define "categories" }}
-  {{ range $i, $v := $.Order }}
+  {{ range $i, $v := $.OrderedCategories }}
     {{ $humanized := (index $.Categories $v) }}
-    {{ template "emojis" (wrap "Emojis" $.Emojis "Category" $v "Humanized" $humanized) }}
+    {{ template "emojis" (wrap "Emojis" $.Emojis "OrderedEmojis" $.OrderedEmojis "Category" $v "Humanized" $humanized) }}
   {{ end }}
 {{ end }}
 

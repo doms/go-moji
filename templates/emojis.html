@@ -2,15 +2,16 @@
   <div class="emoji-group p-1 js-category-group" id="{{ .Category }}">
     <div class="emoji-category p-1 my-2 f6 text-bold">{{ .Humanized }}</div>
     <div class="clearfix">
-      {{ range $name, $emoji := $.Emojis }}
-        {{ if eq $emoji.Category $.Category }}
-          <button type="button"
-              value="{{ $emoji.Char }}"
-              class="emoji rounded-1 px-1 col-2 text-center float-left"
-              title="{{ concat (printf "%s %s" $name $emoji.Keywords) }}">
-            {{ $emoji.Char }}
-          </button>
-        {{ end }}
+      {{ range $i, $v := $.OrderedEmojis }}
+        {{ $emoji := (index $.Emojis $v)}}
+          {{ if eq $emoji.Category $.Category }}
+            <button type="button"
+                value="{{ $emoji.Char }}"
+                class="emoji rounded-1 px-1 col-2 text-center float-left"
+                title="{{ concat (printf "%s %s" $v $emoji.Keywords) }}">
+              {{ $emoji.Char }}
+            </button>
+          {{ end }}
       {{ end }}
     </div>
   </div>

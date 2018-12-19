@@ -57,7 +57,8 @@ var (
 	skinToneSelections = []string{"👋", "👋🏻", "👋🏼", "👋🏽", "👋🏾", "👋🏿"}
 
 	// fetch emojis
-	emojis = loadEmojis()
+	emojis            = loadEmojis()
+	orderedEmojiNames = loadOrderedEmojis()
 
 	// skin tone selector
 	hand string
@@ -75,7 +76,7 @@ var (
 	}
 
 	// https://stackoverflow.com/a/19127931
-	order = []string{
+	orderedCategoryNames = []string{
 		"people",
 		"animals_and_nature",
 		"food_and_drink",
@@ -126,6 +127,18 @@ func loadEmojis() map[string]emoji {
 	var emojis map[string]emoji
 	json.Unmarshal(lib, &emojis)
 	return emojis
+}
+
+func loadOrderedEmojis() []string {
+	// try to read ordered.json
+	lib, err := ioutil.ReadFile(basepath + "/../db/ordered.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var ordered []string
+	json.Unmarshal(lib, &ordered)
+	return ordered
 }
 
 // fetchEmojis - fetches from source if not available locally
@@ -200,13 +213,15 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		Emojis             map[string]emoji
 		Categories         map[string]string
 		SkinToneSelections []string
-		Order              []string
+		OrderedCategories  []string
+		OrderedEmojis      []string
 		Hand               string
 	}{
 		emojis,
 		categories,
 		skinToneSelections,
-		order,
+		orderedCategoryNames,
+		orderedEmojiNames,
 		hand,
 	}
 
@@ -256,13 +271,15 @@ func FetchSkinTonesHandler(w http.ResponseWriter, r *http.Request) {
 		Emojis             map[string]emoji
 		Categories         map[string]string
 		SkinToneSelections []string
-		Order              []string
+		OrderedCategories  []string
+		OrderedEmojis      []string
 		Hand               string
 	}{
 		updatedEmojis,
 		categories,
 		skinToneSelections,
-		order,
+		orderedCategoryNames,
+		orderedEmojiNames,
 		hand,
 	}
 
