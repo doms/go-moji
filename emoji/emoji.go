@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"reflect"
 	"regexp"
 	"runtime"
 	"strconv"
@@ -26,35 +25,6 @@ var (
 	// allowed templates
 	// https://stackoverflow.com/a/46201881
 	templates = template.Must(template.New("").Funcs(template.FuncMap{
-		"dict": func(values ...interface{}) (map[string]interface{}, error) {
-			if len(values) == 0 {
-				return nil, errors.New("invalid dict call")
-			}
-
-			dict := make(map[string]interface{})
-
-			for i := 0; i < len(values); i++ {
-				key, isset := values[i].(string)
-				if !isset {
-					if reflect.TypeOf(values[i]).Kind() == reflect.Map {
-						m := values[i].(map[string]interface{})
-						for i, v := range m {
-							dict[i] = v
-						}
-					} else {
-						return nil, errors.New("dict values must be maps")
-					}
-				} else {
-					i++
-					if i == len(values) {
-						return nil, errors.New("specify the key for non array values")
-					}
-					dict[key] = values[i]
-				}
-
-			}
-			return dict, nil
-		},
 		"wrap": func(values ...interface{}) (map[string]interface{}, error) {
 			data := make(map[string]interface{}, len(values)/2)
 
