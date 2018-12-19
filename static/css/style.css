@@ -1,0 +1,53 @@
+html {
+  height: 100%;
+}
+
+img {
+  height: 25px;
+  width: auto;
+}
+
+.hide {
+  display: none !important;
+}
+
+#selectedSkinTone {
+  background-color: #FFF;
+}
+
+button#selectedSkinTone  {
+  font-size: 1.8em;
+  white-space: nowrap;
+}
+
+.skin-tone {
+  font-size: 1.8em;
+  cursor: pointer;
+  background-color: #FFF;
+}
+
+.skin-tone:focus {
+  z-index: 100;
+}
+
+.emoji:hover, .skin-tone:hover, .skin-tone:focus, #selectedSkinTone:hover, #selectedSkinTone:focus {
+  background-color: #DBEDFF;
+}
+
+.emoji {
+  display: inline-block;
+  cursor: pointer;
+  font-size: 1.8em;
+  border: 0;
+  background: transparent;
+}
+
+.category-column {
+  font-size: 1.8em;
+}
+
+div#skinToneSelector {
+  z-index: 100;
+  width: 240px;
+  top: -85px;
+}
