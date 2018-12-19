@@ -43,6 +43,9 @@ var fitzpatrickScaleModifiers = map[string]string{
 	"skin_tone_5": "🏿",
 }
 
+// skin tone options
+var skinToneSelections = []string{"✋", "✋🏻", "✋🏼", "✋🏽", "✋🏾", "✋🏿"}
+
 func loadUniversalEmojis() map[string]emoji {
 	// try to read emoji.json
 	lib, err := ioutil.ReadFile("./db/emojis.json")
@@ -97,27 +100,8 @@ func addModifier(e emoji, modifier string) string {
 
 }
 
-func combineEmojiWithTones(baseEmoji string) []string {
-	// tones: ["🏻", "🏼", "🏽", "🏾", "🏿"]
-	var tones []string
-	for _, v := range fitzpatrickScaleModifiers {
-		tones = append(tones, v)
-	}
-
-	// base emoji: ✋
-	var sts []string
-	sts = append(sts, baseEmoji)
-
-	// ✋🏻✋🏼✋🏽✋🏾✋🏿
-	for _, tone := range tones {
-		sts = append(sts, baseEmoji+tone)
-	}
-
-	return sts
-}
-
 func mergeMaps(o map[string]emoji, st map[string]emoji) map[string]emoji {
-	var merger map[string]emoji
+	merger := make(map[string]emoji, len(st))
 
 	for name, emoji := range o {
 		merger[name] = emoji
@@ -138,10 +122,11 @@ func fetchSkinTonesHandler(w http.ResponseWriter, r *http.Request) {
 	emojis := loadUniversalEmojis()
 
 	// get modifier value
-	skinToneModifier := fitzpatrickScaleModifiers[r.FormValue("skintone")]
+	tone := r.URL.Query()["skintone"][0]
+	skinToneModifier := fitzpatrickScaleModifiers[tone]
 
 	// grab emojis that can have their skin tone changed (e.g. "fitzpatrick_scale": true)
-	var skinTonableEmojis map[string]emoji
+	skinTonableEmojis := make(map[string]emoji, len(emojis))
 	for name, emoji := range emojis {
 		if emoji.FitzpatrickScale {
 			skinTonableEmojis[name] = emoji
@@ -149,7 +134,7 @@ func fetchSkinTonesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// change skin tones
-	var skinTonedEmojis map[string]emoji
+	skinTonedEmojis := make(map[string]emoji, len(skinTonableEmojis))
 	for name, emoji := range skinTonableEmojis {
 		emoji.Char = addModifier(emoji, skinToneModifier)
 		skinTonedEmojis[name] = emoji
@@ -162,12 +147,12 @@ func fetchSkinTonesHandler(w http.ResponseWriter, r *http.Request) {
 	expiration := time.Now().Add(365 * 24 * time.Hour)
 	cookie := http.Cookie{
 		Name:    "tone",
-		Value:   string(r.FormValue("tone")[len(r.FormValue("tone"))-1]),
+		Value:   string(tone[len(tone)-1]),
 		Expires: expiration,
 	}
 	http.SetCookie(w, &cookie)
 
-	// TODO: send to template
+	// send to template
 	data := struct {
 		Emojis             map[string]emoji
 		Categories         map[string]string
@@ -176,7 +161,7 @@ func fetchSkinTonesHandler(w http.ResponseWriter, r *http.Request) {
 	}{
 		updatedEmojis,
 		categories,
-		nil,
+		skinToneSelections,
 		"",
 	}
 
@@ -186,9 +171,6 @@ func fetchSkinTonesHandler(w http.ResponseWriter, r *http.Request) {
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	// get emojis
 	emojis := loadUniversalEmojis()
-
-	// setup skin tone picker
-	skinToneSelections := combineEmojiWithTones("✋")
 
 	// skin tone preference
 	var hand string
@@ -201,7 +183,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		hand = skinToneSelections[preference]
 	}
 
-	// TODO: send to template
+	// send to template
 	data := struct {
 		Emojis             map[string]emoji
 		Categories         map[string]string
@@ -233,6 +215,7 @@ func main() {
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	http.HandleFunc("/", indexHandler)
+	http.HandleFunc("/fetch-skin-tones", fetchSkinTonesHandler)
 
 	// listen on port
 	log.Println("Listening on :4567...")
