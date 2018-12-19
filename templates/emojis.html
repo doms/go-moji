@@ -3,10 +3,10 @@
   <div class="emoji-group p-1 js-category-group" id="😤">
     <div class="emoji-category p-1 my-2 f6 text-bold">Test</div>
     <div class="clearfix">
-      {{ range $name, $emoji := .Emojis }}
+      {{ range $name, $emoji := . }}
         <button type="button"
             value="{{ $emoji.Char }}"
-            class="emoji rounded-1 px-1 col-3 text-center float-left"
+            class="emoji rounded-1 px-1 col-2 text-center float-left"
             title="{{ $name }}">
           {{ $emoji.Char }}
         </button>
