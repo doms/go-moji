@@ -7,8 +7,8 @@
 
   <body class="height-full">
     <div class="height-full d-flex flex-column">
-        {{ template "navbar" . }}
-        {{ template "emojis" .Emojis }}
+      {{ template "navbar" . }}
+      {{ template "emojis" dict "Emojis" .Emojis "Categories" .Categories }}
       <div class="width-full">
         <div class="p-2 d-flex flex-row flex-item-equal">
           <input id="search" class="flex-auto form-control width-full" autocomplete="off" placeholder="Search for emojis" autofocus/>

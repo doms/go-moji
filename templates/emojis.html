@@ -1,17 +1,21 @@
 {{ define "emojis" }}
-<div class="emoji-picker flex-auto flex-column overflow-auto scrollContainer" id="emojis">
-  <div class="emoji-group p-1 js-category-group" id="😤">
-    <div class="emoji-category p-1 my-2 f6 text-bold">Test</div>
-    <div class="clearfix">
-      {{ range $name, $emoji := . }}
-        <button type="button"
-            value="{{ $emoji.Char }}"
-            class="emoji rounded-1 px-1 col-2 text-center float-left"
-            title="{{ $name }}">
-          {{ $emoji.Char }}
-        </button>
-      {{ end }}
+  <div class="emoji-picker flex-auto flex-column overflow-auto scrollContainer" id="emojis">
+  {{ range $category, $humanized := $.Categories }}
+      <div class="emoji-group p-1 js-category-group" id="{{ $category }}">
+        <div class="emoji-category p-1 my-2 f6 text-bold">{{ $humanized }}</div>
+        <div class="clearfix">
+          {{ range $name, $emoji := $.Emojis }}
+            {{ if eq $emoji.Category $category }}
+              <button type="button"
+                  value="{{ $emoji.Char }}"
+                  class="emoji rounded-1 px-1 col-2 text-center float-left"
+                  title="{{ $name }}">
+                {{ $emoji.Char }}
+              </button>
+            {{ end }}
+          {{ end }}
+        </div>
+      </div>
+    {{ end }}
     </div>
-  </div>
-</div>
 {{ end }}
