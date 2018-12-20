@@ -101,15 +101,15 @@ type emoji struct {
 // loadEmojis - gets emojis from json, and stores into map of custom type
 func loadEmojis() map[string]emoji {
 	// try to read emoji.json
-	lib, err := ioutil.ReadFile(basepath + "/../db/emojis.json")
-
+	pwd, _ := os.Getwd()
+	lib, err := ioutil.ReadFile(pwd + "/db/emojis.json")
 	if err != nil {
 		if os.IsNotExist(err) {
 			// doesn't exist, grab from emojilib and create emojis.json
 			fmt.Println("No emojis.json found. Fetching..")
 			lib = fetchEmojis()
 			ioutil.WriteFile("emojis.json", lib, 0777)
-			err := os.Rename("./emojis.json", basepath+"/../db/emojis.json")
+			err := os.Rename("./emojis.json", pwd+"/db/emojis.json")
 			if err != nil {
 				panic(err)
 			}
@@ -125,9 +125,21 @@ func loadEmojis() map[string]emoji {
 
 func loadOrderedEmojis() []string {
 	// try to read ordered.json
-	lib, err := ioutil.ReadFile(basepath + "/../db/ordered.json")
+	pwd, _ := os.Getwd()
+	lib, err := ioutil.ReadFile(pwd + "/db/ordered.json")
 	if err != nil {
-		log.Fatal(err)
+		if os.IsNotExist(err) {
+			// doesn't exist, grab from emojilib and create emojis.json
+			fmt.Println("No ordered.json found. Fetching..")
+			lib = fetchOrderedEmojis()
+			ioutil.WriteFile("ordered.json", lib, 0777)
+			err := os.Rename("./ordered.json", pwd+"/db/ordered.json")
+			if err != nil {
+				panic(err)
+			}
+		} else {
+			log.Fatal(err)
+		}
 	}
 
 	var ordered []string
@@ -138,6 +150,17 @@ func loadOrderedEmojis() []string {
 // fetchEmojis - fetches from source if not available locally
 func fetchEmojis() []byte {
 	resp, err := http.Get("https://raw.githubusercontent.com/muan/emojilib/master/emojis.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+	return body
+}
+
+// fetchEmojis - fetches from source if not available locally
+func fetchOrderedEmojis() []byte {
+	resp, err := http.Get("https://raw.githubusercontent.com/muan/emojilib/master/ordered.json")
 	if err != nil {
 		log.Fatal(err)
 	}
