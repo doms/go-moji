@@ -9,19 +9,13 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 	"regexp"
-	"runtime"
 	"strconv"
 	"strings"
 	"time"
 )
 
 var (
-	// https://stackoverflow.com/a/38644571
-	_, b, _, _ = runtime.Caller(0)
-	basepath   = filepath.Dir(b)
-
 	// allowed templates
 	// https://stackoverflow.com/a/46201881
 	templates = template.Must(template.New("").Funcs(template.FuncMap{
