@@ -1,4 +1,13 @@
 ;(() => {
+  function copyToClipboard(str) {
+    const el = document.createElement('textarea');
+    el.value = str;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+  }
+
   function scrollIntoView(event) {
     event.target.scrollIntoView({
       behavior: 'instant',
@@ -69,13 +78,8 @@
     const button = event.target.closest('.emoji')
     if (!button) return
 
-    // HEREBEDRAGONS:
-    // using a template literal with an EMPTY SPACE here to temporarily resolve weird issue
-    // in github/github where comment box appends weird characters after the emoji insert
-    parent.window.postMessage(
-      {markdown: `${button.value} `, minimize: true},
-      '*'
-    )
+    // copy text to clipboard
+    copyToClipboard(button.value)
   })
 
   const search = document.getElementById('search')
