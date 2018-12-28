@@ -17,24 +17,19 @@ import (
 )
 
 var (
-	// allowed templates
-	// https://stackoverflow.com/a/46201881
 	templates = template.Must(template.New("").Funcs(template.FuncMap{
 		"wrap":   utils.Wrap,
 		"concat": utils.Concat,
 	}).ParseGlob("templates/*"))
 
-	// skin tones
 	skinToneSelections = []string{"👋", "👋🏻", "👋🏼", "👋🏽", "👋🏾", "👋🏿"}
 
-	// fetch emojis
 	emojis            = loadEmojis()
 	orderedEmojiNames = loadOrderedEmojis()
 
 	// skin tone selector
 	hand string
 
-	// emoji categories
 	categories = map[string]string{
 		"people":             "Smileys & People",
 		"animals_and_nature": "Animals & Nature",
@@ -46,7 +41,6 @@ var (
 		"flags":              "Flags",
 	}
 
-	// https://stackoverflow.com/a/19127931
 	orderedCategoryNames = []string{
 		"people",
 		"animals_and_nature",
@@ -75,7 +69,6 @@ type emoji struct {
 	Category         string   `json:"category"`
 }
 
-// loadEmojis - gets emojis from json, and stores into map of custom type
 func loadEmojis() map[string]emoji {
 	// try to read emoji.json
 	pwd, _ := os.Getwd()
@@ -124,7 +117,6 @@ func loadOrderedEmojis() []string {
 	return ordered
 }
 
-// fetchEmojis - fetches from source if not available locally
 func fetchEmojis() []byte {
 	resp, err := http.Get("https://raw.githubusercontent.com/muan/emojilib/master/emojis.json")
 	if err != nil {
@@ -135,7 +127,6 @@ func fetchEmojis() []byte {
 	return body
 }
 
-// fetchEmojis - fetches from source if not available locally
 func fetchOrderedEmojis() []byte {
 	resp, err := http.Get("https://raw.githubusercontent.com/muan/emojilib/master/ordered.json")
 	if err != nil {
@@ -154,17 +145,14 @@ func addModifier(e emoji, modifier string) string {
 	}
 
 	// skin tone magic explained: https://emojipedia.org/zero-width-joiner/
-	// zwj := regexp.MustCompile("‍")
-	// matches := zwj.FindAllString(emoji["char"])
-
 	zwj := "‍"
 	match, _ := regexp.Match(zwj, []byte(e.Char))
 
 	if match {
 		return strings.Replace(e.Char, zwj, modifier+zwj, -1)
 	}
-	return e.Char + modifier
 
+	return e.Char + modifier
 }
 
 // mergeMaps - merge maps of non-skintone-able emojis and skintone-able emojis
@@ -175,7 +163,6 @@ func mergeMaps(o map[string]emoji, st map[string]emoji) map[string]emoji {
 		merger[name] = emoji
 	}
 
-	// skin toned emoji map
 	for name, emoji := range st {
 		if _, ok := merger[name]; ok {
 			merger[name] = emoji
@@ -187,7 +174,6 @@ func mergeMaps(o map[string]emoji, st map[string]emoji) map[string]emoji {
 
 // IndexHandler - renders the emojis (with skin tone preference if applicable)
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
-	// get emojis
 	if emojis == nil {
 		emojis = loadEmojis()
 	}
@@ -195,7 +181,6 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 	// skin tone preference
 	c, err := r.Cookie("tone")
 	if err != nil {
-		// existing preference not set, use default
 		hand = skinToneSelections[0]
 	} else {
 		preference, _ := strconv.Atoi(c.Value)
@@ -224,7 +209,6 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 
 // FetchSkinTonesHandler - add skin tones to skintone-able emojis
 func FetchSkinTonesHandler(w http.ResponseWriter, r *http.Request) {
-	// load emojis to replace skin-toneable emojis with preferred skin tone emojis
 	if emojis == nil {
 		emojis = loadEmojis()
 	}

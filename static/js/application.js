@@ -95,7 +95,6 @@
   }
 
   function performSearch() {
-    // grab search term
     const searchTerm = search.value.toLowerCase()
 
     // hide emoji categories when searching
@@ -106,7 +105,7 @@
     }
 
     for (const emoji of document.querySelectorAll('.emoji')) {
-      const emojiName = emoji.getAttribute('title')
+      const emojiName = emoji.getAttribute('data-keywords')
 
       // show emoji if it matches search term, otherwise hide it
       if (emojiName.indexOf(searchTerm) !== -1) {
@@ -147,8 +146,6 @@
       const html = await response.text()
 
       emojiDiv.innerHTML = html
-
-      // update selected skin tone
       updateSelectedSkinTone(event)
     } else {
       console.log(response.status)
